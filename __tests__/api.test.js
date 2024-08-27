@@ -17,7 +17,6 @@ describe('GET /api/topics', () => {
             .get("/api/topics")
             .expect(200)
             .then(({ body }) => {
-                console.log(body)
                 body.data.forEach((topic) => {
                     expect(topic).toMatchObject({
                         description: expect.any(String), slug: expect.any(String)
@@ -25,4 +24,10 @@ describe('GET /api/topics', () => {
                 })
             })
     })
+    test('404: responds with an appropriate message when an incorrect url is used', () => {
+        return request(app)
+            .get('/api/topicz')
+            .expect(404)
+    })
 })
+
