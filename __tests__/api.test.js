@@ -27,6 +27,7 @@ describe('GET /api/topics', () => {
             })
     })
 });
+
 describe('Non-existent endpoint', () => {
     test('404: responds with an appropriate message when an incorrect url is used', () => {
         return request(app)
@@ -37,7 +38,7 @@ describe('Non-existent endpoint', () => {
             })
     });
     
-})
+});
 
 describe('GET /api', () => {
     test('200: responds with an object documenting all of the endpoints', () => {
@@ -110,7 +111,7 @@ describe('GET /api/articles', () => {
             })
     })
 
-})
+});
 
 describe('GET /api/articles/:article_id/comments', () => {
     test('200: responds with an array of comments for the given article_id', () => {
@@ -150,4 +151,60 @@ describe('GET /api/articles/:article_id/comments', () => {
                 expect(body.msg).toBe('Bad request');
             });
     });
+});
+
+describe('POST /api/articles/:article_id/comments', () => {
+    test("201: responds with the posted comment and adds the comment to an article", () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'this article sucks'
+        };
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({body}) => {
+            expect(body.comment).toMatchObject({
+                author: 'butter_bridge',
+                body: 'this article sucks'
+            })
+        })
+    })
+    test("400: responds with an appropriate status and error message when provided with a non-existent user-name", () => {
+        const newComment = {
+            body: 'this article sucks'
+        };
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Username does not exist')
+        })
+    });
+    test("400: responds with an appropriate status and error message when provided with a non-existent body", () => {
+        const newComment = {
+            username: 'butter_bridge'
+        };
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Body does not exist')
+        })
+    })
+    test('404: responds with appropriate status and msg when given a valid id but non-existent id', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'this article sucks'
+        };
+        return request(app)
+        .post("/api/articles/999/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe('article does not exist')
+        });
+    })
 })
