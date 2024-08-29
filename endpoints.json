@@ -17,10 +17,8 @@
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": [
-      "author",
-      "topic",
-      "sort_by",
-      "order"
+      {"sort_by": "column name"},
+      {"order": "asc/desc"}
     ],
     "exampleResponse": {
       "articles": [
@@ -105,9 +103,9 @@
     "queries": [],
     "exampleResponse": "204 no content"
   },
-  "GET /api/users": {
+  "GET /api/users" : {
     "description": "serves an array of all users",
-    "queries": [],
+    "queries": ["sort_by", "order"],
     "exampleResponse": {
       "users": [
         {
