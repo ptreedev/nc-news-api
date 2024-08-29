@@ -104,5 +104,20 @@
     "description": "deletes the selected comment and returns a status code of 204",
     "queries": [],
     "exampleResponse": "204 no content"
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+      
+      
+    }
   }
 }
