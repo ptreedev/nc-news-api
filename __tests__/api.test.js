@@ -33,11 +33,11 @@ describe('Non-existent endpoint', () => {
         return request(app)
             .get('/api/topicz')
             .expect(404)
-            .then(({body}) => {
+            .then(({ body }) => {
                 expect(body.msg).toBe('URL not found')
             })
     });
-    
+
 });
 
 describe('GET /api', () => {
@@ -65,7 +65,7 @@ describe('GET /api/articles/:article_id', () => {
                         topic: expect.any(String),
                         article_img_url: expect.any(String),
                         article_id: expect.any(Number),
-                        votes: expect.any(Number || Null),
+                        votes: expect.any(Number),
                     }
                 });
             });
@@ -137,11 +137,11 @@ describe('GET /api/articles/:article_id/comments', () => {
     })
     test('404: responds with appropriate status and msg when given a valid id but non-existent id', () => {
         return request(app)
-        .get("/api/articles/999/comments")
-        .expect(404)
-        .then(({ body }) => {
-            expect(body.msg).toBe('article does not exist')
-        });
+            .get("/api/articles/999/comments")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('article does not exist')
+            });
     })
     test('400: sends and appropriate status and error message when given an ivalid id', () => {
         return request(app)
@@ -160,39 +160,39 @@ describe('POST /api/articles/:article_id/comments', () => {
             body: 'this article sucks'
         };
         return request(app)
-        .post("/api/articles/1/comments")
-        .send(newComment)
-        .expect(201)
-        .then(({body}) => {
-            expect(body.comment).toMatchObject({
-                author: 'butter_bridge',
-                body: 'this article sucks'
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject({
+                    author: 'butter_bridge',
+                    body: 'this article sucks'
+                })
             })
-        })
     })
     test("400: responds with an appropriate status and error message when provided with a non-existent user-name", () => {
         const newComment = {
             body: 'this article sucks'
         };
         return request(app)
-        .post("/api/articles/1/comments")
-        .send(newComment)
-        .expect(400)
-        .then(({body}) => {
-            expect(body.msg).toBe('Username does not exist')
-        })
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Username does not exist')
+            })
     });
     test("400: responds with an appropriate status and error message when provided with a non-existent body", () => {
         const newComment = {
             username: 'butter_bridge'
         };
         return request(app)
-        .post("/api/articles/1/comments")
-        .send(newComment)
-        .expect(400)
-        .then(({body}) => {
-            expect(body.msg).toBe('Body does not exist')
-        })
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Body does not exist')
+            })
     })
     test('404: responds with appropriate status and msg when given a valid id but non-existent id', () => {
         const newComment = {
@@ -200,11 +200,99 @@ describe('POST /api/articles/:article_id/comments', () => {
             body: 'this article sucks'
         };
         return request(app)
-        .post("/api/articles/999/comments")
-        .send(newComment)
-        .expect(404)
-        .then(({ body }) => {
-            expect(body.msg).toBe('article does not exist')
-        });
+            .post("/api/articles/999/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('article does not exist')
+            });
+    })
+})
+
+describe('PATCH /api/articles/:article_id', () => {
+    test('200: Responds with correct status and updated article', () => {
+        const newVote = 10
+        const votePatch = {
+            inc_votes: newVote
+        }
+        return request(app)
+            .patch("/api/articles/1")
+            .send(votePatch)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body).toMatchObject({
+                    article: {
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        article_img_url: expect.any(String),
+                        article_id: expect.any(Number),
+                        votes: 110,
+                    }
+                })
+            })
+    });
+    test('200: Responds with correct status and updated article when downvoting', () => {
+        const newVote = -101
+        const votePatch = {
+            inc_votes: newVote
+        }
+        return request(app)
+            .patch("/api/articles/1")
+            .send(votePatch)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body).toMatchObject({
+                    article: {
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        article_img_url: expect.any(String),
+                        article_id: expect.any(Number),
+                        votes: -1,
+                    }
+                })
+            })
+    })
+    test('400: Responds with appropriate message and code when invalid article requested', () => {
+        const newVote = 10
+        const votePatch = {
+            inc_votes: newVote
+        }
+        return request(app)
+            .patch("/api/articles/banana")
+            .send(votePatch)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request")
+            })
+    })
+    test('404: Responds with appropriate message and code when valid but non-existing article requested', () => {
+        const newVote = 10
+        const votePatch = {
+            inc_votes: newVote
+        }
+        return request(app)
+            .patch("/api/articles/999")
+            .send(votePatch)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("article does not exist")
+            })
+    })
+    test('400: Responds with appropriate message and code when PATCH body sent', () => {
+        const newVote = "cat"
+        const votePatch = {
+            inc_votes: newVote
+        }
+        return request(app)
+            .patch("/api/articles/1")
+            .send(votePatch)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request")
+            })
     })
 })

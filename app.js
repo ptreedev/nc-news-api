@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleId, postCommentByArticleId } = require('./controllers/controllers')
+const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleId, postCommentByArticleId, patchArticle } = require('./controllers/controllers')
 
 app.use(express.json());
 
@@ -12,9 +12,12 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
 
 app.post('/api/articles/:article_id/comments', postCommentByArticleId)
 
+app.patch('/api/articles/:article_id', patchArticle)
+
 app.all('*', (req, res) => {
   res.status(404).send({ msg: "URL not found"})
 })
+
 app.use((err, req, res, next)=>{
   if(err.code === '23503'){
     res.status(404).send({ msg: "article does not exist"})
