@@ -282,4 +282,17 @@ describe('PATCH /api/articles/:article_id', () => {
                 expect(body.msg).toBe("article does not exist")
             })
     })
+    test('400: Responds with appropriate message and code when PATCH body sent', () => {
+        const newVote = "cat"
+        const votePatch = {
+            inc_votes: newVote
+        }
+        return request(app)
+            .patch("/api/articles/1")
+            .send(votePatch)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request")
+            })
+    })
 })
