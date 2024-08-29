@@ -74,3 +74,10 @@ exports.removeCommentById = (comment_id) => {
         }
     })
 }
+
+exports.selectUsers = () => {
+    return db.query("SELECT * FROM users")
+    .then(results => {
+        return results.rows
+    })
+}

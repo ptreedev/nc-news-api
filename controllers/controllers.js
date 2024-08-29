@@ -1,4 +1,4 @@
-const { selectTopics, selectEndpoints, selectArticleById, selectArticles, selectCommentsByArticleId, insertComment, modifyArticle, removeCommentById } = require('../models/models')
+const { selectTopics, selectEndpoints, selectArticleById, selectArticles, selectCommentsByArticleId, insertComment, modifyArticle, removeCommentById, selectUsers } = require('../models/models')
 
 exports.getTopics = (req, res, next) => {
     selectTopics().then((data) => {
@@ -47,26 +47,35 @@ exports.postCommentByArticleId = (req, res, next) => {
     insertComment(newComment, article_id).then((comment) => {
         res.status(201).send({ comment })
     })
-    .catch(err => {
-        next(err)
-    })
+        .catch(err => {
+            next(err)
+        })
 }
 
 exports.patchArticle = (req, res, next) => {
-    const {article_id} = req.params;
-    const {inc_votes} = req.body;
+    const { article_id } = req.params;
+    const { inc_votes } = req.body;
     modifyArticle(article_id, inc_votes).then((article) => {
         res.status(200).send({ article })
     })
-    .catch(err => {
-        next(err)
-    })
+        .catch(err => {
+            next(err)
+        })
 }
 
 exports.deleteCommentById = (req, res, next) => {
-    const {comment_id} = req.params;
+    const { comment_id } = req.params;
     removeCommentById(comment_id).then(() => {
         res.status(204).send();
+    })
+        .catch(err => {
+            next(err)
+        })
+}
+
+exports.getUsers = (req, res, next) => {
+    selectUsers().then((users) => {
+        res.status(200).send({ users })
     })
     .catch(err => {
         next(err)
