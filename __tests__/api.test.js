@@ -210,7 +210,7 @@ describe('POST /api/articles/:article_id/comments', () => {
 })
 
 describe('PATCH /api/articles/:article_id', () => {
-    test('200: Responds with correct status and updated article', () => {
+    test('200: Responds with correct status and updated vote count of specific article', () => {
         const newVote = 10
         const votePatch = {
             inc_votes: newVote
@@ -227,7 +227,7 @@ describe('PATCH /api/articles/:article_id', () => {
                         body: expect.any(String),
                         topic: expect.any(String),
                         article_img_url: expect.any(String),
-                        article_id: expect.any(Number),
+                        article_id: 1,
                         votes: 110,
                     }
                 })
@@ -250,7 +250,7 @@ describe('PATCH /api/articles/:article_id', () => {
                         body: expect.any(String),
                         topic: expect.any(String),
                         article_img_url: expect.any(String),
-                        article_id: expect.any(Number),
+                        article_id: 1,
                         votes: -1,
                     }
                 })
@@ -282,7 +282,7 @@ describe('PATCH /api/articles/:article_id', () => {
                 expect(body.msg).toBe("article does not exist")
             })
     })
-    test('400: Responds with appropriate message and code when PATCH body sent', () => {
+    test('400: Responds with appropriate message and code when invalid PATCH body sent', () => {
         const newVote = "cat"
         const votePatch = {
             inc_votes: newVote
