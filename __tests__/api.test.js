@@ -111,6 +111,7 @@ describe('GET /api/articles', () => {
             })
     })
 
+
 });
 
 describe('GET /api/articles/:article_id/comments', () => {
@@ -300,41 +301,100 @@ describe('PATCH /api/articles/:article_id', () => {
 describe("DELETE /api/comments/:comment_id", () => {
     test("204: deletes the given comment by comment_id and sends the status code and no content", () => {
         return request(app)
-        .delete("/api/comments/2")
-        .expect(204)
+            .delete("/api/comments/2")
+            .expect(204)
     })
     test("400: returns status code and appropriate message when given an invalid cooment_id", () => {
         return request(app)
-        .delete("/api/comments/banana")
-        .expect(400)
-        .then(({ body }) => {
-            expect(body.msg).toBe("Bad request")
-        })
+            .delete("/api/comments/banana")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request")
+            })
     })
     test("404: returns status code and appropriate message when given a valid but non-existent comment_id", () => {
         return request(app)
-        .delete("/api/comments/999")
-        .expect(404)
-        .then(({body}) => {
-            expect(body.msg).toBe("comment does not exist")
-        })
+            .delete("/api/comments/999")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("comment does not exist")
+            })
     })
 })
 
 describe("GET /api/users", () => {
     test("200: gets all users and responds with an array of objects", () => {
         return request(app)
-        .get("/api/users")
-        .expect(200)
-        .then(({body}) => {
-            expect(body.users.length).toBe(4)
-            body.users.forEach((user) => {
-                expect(user).toMatchObject({
-                    username: expect.any(String),
-                    name: expect.any(String),
-                    avatar_url: expect.any(String)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.users.length).toBe(4)
+                body.users.forEach((user) => {
+                    expect(user).toMatchObject({
+                        username: expect.any(String),
+                        name: expect.any(String),
+                        avatar_url: expect.any(String)
+                    })
                 })
             })
+    })
+})
+
+describe("GET GET /api/articles (sorting queries)", () => {
+    test("200: responds with an array of article objects sorted by any column in default descending order", () => {
+        return request(app)
+            .get("/api/articles?sort_by=title")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toBeSortedBy('title', { descending: true })
+            })
+    })
+    test("400: responds with appropriate status and message when query value for sort_by is not valid", () => {
+        return request(app)
+            .get("/api/articles?sort_by=carrot")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("invalid request")
+            })
+    })
+    test("200: responds with an array of article objects sorted by default column created_by in ascending order", () => {
+        return request(app)
+            .get("/api/articles?order=asc")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toBeSortedBy('created_at', { ascending: true })
+            })
+    })
+    test("200: responds with an array of article objects sorted by default column created_by in descending order", () => {
+        return request(app)
+            .get("/api/articles?order=desc")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toBeSortedBy('created_at', { descending: true })
+            })
+    })
+    test("400: responds with appropriate status and message when query value for order is not valid", () => {
+        return request(app)
+            .get("/api/articles?order=lowest")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("invalid request")
+            })
+    })
+    test("200: responds with an array of article objects sorted by chosen column in chosen order", () => {
+        return request(app)
+        .get("/api/articles?sort_by=title&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.articles).toBeSortedBy('title', { ascending: true })
         })
+    })
+    test("400: responds with appropriate status and message when query is not valid when using both sort_by and order", () => {
+        return request(app)
+            .get("/api/articles?sort_by=carrot&order=lowest")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("invalid request")
+            })
     })
 })
