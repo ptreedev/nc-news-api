@@ -32,7 +32,8 @@ exports.selectArticles = (sort_by, order, topic) => {
         "author",
         "body",
         "created_at",
-        "article_img_url"
+        "article_img_url",
+        "comment_count"
     ]
     const validOrders = ["asc", "desc"]
     const validTopics = ["mitch", "cats", "paper"]
