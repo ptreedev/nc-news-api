@@ -18,7 +18,8 @@
     "description": "serves an array of all articles",
     "queries": [
       {"sort_by": "column name"},
-      {"order": "asc/desc"}
+      {"order": "asc/desc"},
+      {"topic": "valid topic"}
     ],
     "exampleResponse": {
       "articles": [
