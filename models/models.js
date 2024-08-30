@@ -24,8 +24,8 @@ exports.selectArticleById = (article_id) => {
         })
 }
 
-exports.selectArticles = (sort_by, order) => {
-    let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id"
+exports.selectArticles = (sort_by, order, topic) => {
+    let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id"
     const validColumns = [
         "title",
         "topic",
@@ -35,8 +35,17 @@ exports.selectArticles = (sort_by, order) => {
         "article_img_url"
     ]
     const validOrders = ["asc", "desc"]
-    if(sort_by && order){
-        if(!validOrders.includes(order) || !validColumns.includes(sort_by)){
+    const validTopics = ["mitch", "cats", "paper"]
+    if (topic) {
+        if (!validTopics.includes(topic)) {
+            return Promise.reject({ status: 400, msg: "invalid request" })
+        } else queryStr += ` WHERE topic = '${topic}'`
+    };
+
+    queryStr += " GROUP BY articles.article_id";
+
+    if (sort_by && order) {
+        if (!validOrders.includes(order) || !validColumns.includes(sort_by)) {
             return Promise.reject({ status: 400, msg: "invalid request" })
         } else {
             const capped = order.toUpperCase()
@@ -64,6 +73,12 @@ exports.selectArticles = (sort_by, order) => {
     }
     return db.query(queryStr)
         .then((results) => {
+            if (results.rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: 'articles not found'
+                })
+            }
             return results.rows
         })
 }

@@ -340,7 +340,7 @@ describe("GET /api/users", () => {
     })
 })
 
-describe("GET GET /api/articles (sorting queries)", () => {
+describe("GET /api/articles (sorting queries)", () => {
     test("200: responds with an array of article objects sorted by any column in default descending order", () => {
         return request(app)
             .get("/api/articles?sort_by=title")
@@ -397,4 +397,68 @@ describe("GET GET /api/articles (sorting queries)", () => {
                 expect(body.msg).toBe("invalid request")
             })
     })
+})
+
+describe("GET /api/articles (topic queries)", () => {
+    test("200: Responds with an array of article/articles filtered by topic query mitch", () => {
+        return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then(({body}) => {
+                expect(body.articles.length >= 1).toBe(true)
+                body.articles.forEach((article) => {
+                    expect(article).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        topic: "mitch",
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String),
+                        comment_count: expect.any(String),
+                        article_id: expect.any(Number),
+                        created_at: expect.any(String)
+                    })
+                })
+            })
+
+    })
+    test("200: Responds with an array of article/articles filtered by topic query cats", () => {
+        return request(app)
+            .get("/api/articles?topic=cats")
+            .expect(200)
+            .then(({body}) => {
+                expect(body.articles.length >= 1).toBe(true)
+                body.articles.forEach((article) => {
+                    expect(article).toMatchObject({
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        topic: "cats",
+                        votes: expect.any(Number),
+                        article_img_url: expect.any(String),
+                        comment_count: expect.any(String),
+                        article_id: expect.any(Number),
+                        created_at: expect.any(String)
+                    })
+                })
+            })
+
+    })
+    test("404: Responds with an empty array of article/articles filtered by topic query 'paper' when topic exists but is not found in articles table", () => {
+        return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(404)
+            .then(({body}) => {
+            expect(body.msg).toEqual("articles not found")
+                
+            })
+
+    })
+    test("400: responds with appropriate status and message when query is not valid when using topic", () => {
+        return request(app)
+            .get("/api/articles?topic=9999")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("invalid request")
+            })
+    })
+
 })
