@@ -1,21 +1,15 @@
 const express = require('express');
 const app = express();
-const { getTopics, getEndpoints, getArticleById, getArticles, getCommentsByArticleId, postCommentByArticleId, patchArticle, deleteCommentById, getUsers } = require('./controllers/controllers')
+const apiRouter = require("./routers/api-router")
+const { deleteCommentById, getUsers } = require('./controllers/controllers')
 
 app.use(express.json());
-
-app.get('/api/topics', getTopics);
-app.get('/api', getEndpoints);
-app.get('/api/articles/:article_id', getArticleById);
-app.get('/api/articles', getArticles);
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
-app.get('/api/users', getUsers)
-
-app.post('/api/articles/:article_id/comments', postCommentByArticleId)
-
-app.patch('/api/articles/:article_id', patchArticle)
+app.use('/api', apiRouter);
 
 app.delete('/api/comments/:comment_id', deleteCommentById)
+
+
+
 
 app.all('*', (req, res) => {
   res.status(404).send({ msg: "URL not found"})
