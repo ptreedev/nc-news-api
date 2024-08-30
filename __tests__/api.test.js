@@ -462,3 +462,26 @@ describe("GET /api/articles (topic queries)", () => {
     })
 
 })
+
+describe(" GET /api/articles/:id (adding comment count)", () => {
+    test('200: responds with an article object containing the appropriate properties', () => {
+        return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+
+                expect(body).toMatchObject({
+                    article: {
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        body: expect.any(String),
+                        topic: expect.any(String),
+                        article_img_url: expect.any(String),
+                        article_id: 1,
+                        votes: expect.any(Number),
+                        comment_count: "11"
+                    }
+                });
+            });
+    });
+})
