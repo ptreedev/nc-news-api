@@ -442,12 +442,12 @@ describe("GET /api/articles (topic queries)", () => {
             })
 
     })
-    test("404: Responds with an empty array of article/articles filtered by topic query 'paper' when topic exists but is not found in articles table", () => {
+    test("200: Responds with an empty array of article/articles filtered by topic query 'paper' when topic exists but is not found in articles table", () => {
         return request(app)
             .get("/api/articles?topic=paper")
-            .expect(404)
+            .expect(200)
             .then(({body}) => {
-            expect(body.msg).toEqual("articles not found")
+            expect(body.articles).toEqual([])
                 
             })
 
